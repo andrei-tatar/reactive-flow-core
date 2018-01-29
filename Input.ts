@@ -14,5 +14,5 @@ export function Input(name?: string) {
 
 /** @internal */
 export function GetInputs(target): { name: string, key: string }[] {
-    return Reflect.getMetadata(inputs, target);
+    return Reflect.getMetadata(inputs, target) || [];
 }
