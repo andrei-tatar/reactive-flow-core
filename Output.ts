@@ -2,9 +2,9 @@ const outputs = Symbol('outputs');
 
 export function Output(name?: string) {
     return (target, key: string) => {
-        if (!name) name = key;
+        if (!name) { name = key; }
         let existing = target[outputs];
-        if (!existing) target[outputs] = existing = [];
+        if (!existing) { target[outputs] = existing = []; }
         existing.push({ name, key });
     };
 }
@@ -12,4 +12,3 @@ export function Output(name?: string) {
 export function GetOutputs(target): { name: string, key: string }[] {
     return target[outputs] || [];
 }
-

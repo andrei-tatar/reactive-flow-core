@@ -1,15 +1,19 @@
-import { NodeTest } from './NodeTest';
+import 'rxjs/add/observable/from';
+import 'rxjs/add/observable/interval';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/from'
-import 'rxjs/add/observable/interval'
 import { setTimeout } from 'timers';
+import { NodeTest } from './NodeTest';
 
 async function test() {
-    let node = new NodeTest();
+    const node = new NodeTest();
+
+    await node.init();
 
     node.setInput('a', Observable.interval(1000));
     node.setInput('b', Observable.from([5]));
     node.getOutput('sum').subscribe(result => console.log(result));
+    node.inputs.subscribe(console.log.bind(console, 'input: '));
+    node.outputs.subscribe(console.log.bind(console, 'output: '));
 
     await new Promise(resolve => setTimeout(resolve, 5000));
 
