@@ -12,6 +12,7 @@
         "interface-name": false,
         "no-console": false,
         "array-type": false,
+        "object-literal-sort-keys": false,
         "member-access": false
     },
     "rulesDirectory": []

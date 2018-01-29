@@ -1,15 +1,17 @@
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
+
 import { GetInputs } from './Input';
 import { GetOutputs } from './Output';
+import { Dictionary } from './Types';
 
 /** @internal */
 import 'rxjs/add/observable/empty';
 /** @internal */
 import 'rxjs/add/operator/switchMap';
 
-export abstract class NodeBase {
+export class NodeBase<TConfig = any> {
     /** @internal */
     private readonly inputDict: Dictionary<ReplaySubject<any>> = {};
     /** @internal */
@@ -26,7 +28,10 @@ export abstract class NodeBase {
         return this.outputNames.asObservable();
     }
 
-    constructor() {
+    constructor(
+        public readonly id: string,
+        public readonly config: TConfig,
+    ) {
         const attrInputs = GetInputs(this);
         for (const attrInput of attrInputs) {
             const input = this.getInput(attrInput.name);
@@ -105,8 +110,4 @@ export abstract class NodeBase {
             dict[key].complete();
         }
     }
-}
-
-interface Dictionary<T> {
-    [key: string]: T;
 }
