@@ -8,12 +8,8 @@ import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/empty';
 
 export abstract class Node {
-    private _inputs: {
-        [name: string]: ReplaySubject<Observable<any>>
-    } = {};
-    private _outputs: {
-        [name: string]: ReplaySubject<Observable<any>>;
-    } = {};
+    private _inputs: Dictionary<ReplaySubject<any>> = {};
+    private _outputs: Dictionary<ReplaySubject<any>> = {};
 
     protected getInput<T>(name: string) {
         const subject = this.getSubject(this._inputs, name);
@@ -34,7 +30,7 @@ export abstract class Node {
         return this.getSubject(this._outputs, name).switchMap(i => i);
     }
 
-    private getSubject(dict: { [key: string]: ReplaySubject<Observable<any>> }, name: string) {
+    private getSubject(dict: Dictionary<ReplaySubject<any>>, name: string) {
         let existing = dict[name];
         if (!existing) {
             dict[name] = existing = new ReplaySubject(1);
@@ -42,7 +38,8 @@ export abstract class Node {
         return existing;
     }
 
-    private closeDict(dict: { [key: string]: ReplaySubject<Observable<any>> }) {
+
+    private closeDict(dict: Dictionary<ReplaySubject<any>>) {
         for (const key of Object.getOwnPropertyNames(dict)) {
             dict[key].next(Observable.empty());
             dict[key].complete();
@@ -72,4 +69,8 @@ export abstract class Node {
             });
         }
     }
+}
+
+interface Dictionary<T> {
+    [key: string]: T;
 }
