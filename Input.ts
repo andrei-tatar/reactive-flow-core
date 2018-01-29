@@ -9,6 +9,7 @@ export function Input(name?: string) {
     };
 }
 
+/** @internal */
 export function GetInputs(target): { name: string, key: string }[] {
     return target[inputs] || [];
 }

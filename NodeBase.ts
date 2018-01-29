@@ -4,14 +4,20 @@ import { ReplaySubject } from 'rxjs/ReplaySubject';
 import { GetInputs } from './Input';
 import { GetOutputs } from './Output';
 
+/** @internal */
 import 'rxjs/add/observable/empty';
+/** @internal */
 import 'rxjs/add/operator/switchMap';
 
 export abstract class NodeBase {
-    private inputDict: Dictionary<ReplaySubject<any>> = {};
-    private outputDict: Dictionary<ReplaySubject<any>> = {};
-    private inputNames = new ReplaySubject<string>();
-    private outputNames = new ReplaySubject<string>();
+    /** @internal */
+    private readonly inputDict: Dictionary<ReplaySubject<any>> = {};
+    /** @internal */
+    private readonly outputDict: Dictionary<ReplaySubject<any>> = {};
+    /** @internal */
+    private readonly inputNames = new ReplaySubject<string>();
+    /** @internal */
+    private readonly outputNames = new ReplaySubject<string>();
 
     get inputs() {
         return this.inputNames.asObservable();
@@ -72,6 +78,7 @@ export abstract class NodeBase {
         subject.next(value);
     }
 
+    /** @internal */
     private getSubject(name: string, dict: Dictionary<ReplaySubject<any>>, names: ReplaySubject<string>) {
         let existing = dict[name];
         if (!existing) {
@@ -81,14 +88,17 @@ export abstract class NodeBase {
         return existing;
     }
 
+    /** @internal */
     private getInputSubject(name: string) {
         return this.getSubject(name, this.inputDict, this.inputNames);
     }
 
+    /** @internal */
     private getOutputSubject(name: string) {
         return this.getSubject(name, this.outputDict, this.outputNames);
     }
 
+    /** @internal */
     private closeDict(dict: Dictionary<ReplaySubject<any>>) {
         for (const key of Object.getOwnPropertyNames(dict)) {
             dict[key].next(Observable.empty());

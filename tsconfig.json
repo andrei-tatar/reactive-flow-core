@@ -8,7 +8,9 @@
         "target": "es2017",
         "lib": [
             "es2017"
-        ]
+        ],
+        "declaration": true,
+        "stripInternal": true
     },
     "exclude": [
         "node_modules"

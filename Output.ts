@@ -9,6 +9,7 @@ export function Output(name?: string) {
     };
 }
 
+/** @internal */
 export function GetOutputs(target): { name: string, key: string }[] {
     return target[outputs] || [];
 }
