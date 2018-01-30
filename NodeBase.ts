@@ -12,20 +12,16 @@ import 'rxjs/add/observable/empty';
 import 'rxjs/add/operator/switchMap';
 
 export class NodeBase<TConfig = any> {
-    /** @internal */
-    private readonly inputDict: Dictionary<ReplaySubject<any>> = {};
-    /** @internal */
-    private readonly outputDict: Dictionary<ReplaySubject<any>> = {};
-    /** @internal */
-    private readonly inputNames = new ReplaySubject<string>();
-    /** @internal */
-    private readonly outputNames = new ReplaySubject<string>();
+    private readonly _inputDict: Dictionary<ReplaySubject<any>> = {};
+    private readonly _outputDict: Dictionary<ReplaySubject<any>> = {};
+    private readonly _inputNames = new ReplaySubject<string>();
+    private readonly _outputNames = new ReplaySubject<string>();
 
     get inputs() {
-        return this.inputNames.asObservable();
+        return this._inputNames.asObservable();
     }
     get outputs() {
-        return this.outputNames.asObservable();
+        return this._outputNames.asObservable();
     }
 
     constructor(
@@ -54,14 +50,11 @@ export class NodeBase<TConfig = any> {
     }
 
     init(): void | Promise<void> {
-        // do nothing
+        // for inheritance
     }
 
     close(): void | Promise<void> {
-        this.inputNames.complete();
-        this.outputNames.complete();
-        this.closeDict(this.inputDict);
-        this.closeDict(this.outputDict);
+        // for inheritance
     }
 
     setInput(name: string, value: Observable<any>) {
@@ -71,6 +64,18 @@ export class NodeBase<TConfig = any> {
 
     getOutput(name: string) {
         return this.getOutputSubject(name).switchMap(i => i);
+    }
+
+    async initInternal() {
+        await this.init();
+    }
+
+    async closeInternal() {
+        await this.close();
+        this._inputNames.complete();
+        this._outputNames.complete();
+        this.closeDict(this._inputDict);
+        this.closeDict(this._outputDict);
     }
 
     protected getInput<T>(name: string) {
@@ -83,7 +88,6 @@ export class NodeBase<TConfig = any> {
         subject.next(value);
     }
 
-    /** @internal */
     private getSubject(name: string, dict: Dictionary<ReplaySubject<any>>, names: ReplaySubject<string>) {
         let existing = dict[name];
         if (!existing) {
@@ -93,17 +97,14 @@ export class NodeBase<TConfig = any> {
         return existing;
     }
 
-    /** @internal */
     private getInputSubject(name: string) {
-        return this.getSubject(name, this.inputDict, this.inputNames);
+        return this.getSubject(name, this._inputDict, this._inputNames);
     }
 
-    /** @internal */
     private getOutputSubject(name: string) {
-        return this.getSubject(name, this.outputDict, this.outputNames);
+        return this.getSubject(name, this._outputDict, this._outputNames);
     }
 
-    /** @internal */
     private closeDict(dict: Dictionary<ReplaySubject<any>>) {
         for (const key of Object.getOwnPropertyNames(dict)) {
             dict[key].next(Observable.empty());

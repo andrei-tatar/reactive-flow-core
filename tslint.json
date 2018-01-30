@@ -13,7 +13,16 @@
         "no-console": false,
         "array-type": false,
         "object-literal-sort-keys": false,
-        "member-access": false
+        "member-access": false,
+        "variable-name": [
+            true,
+            "check-format",
+            "allow-leading-underscore"
+        ],
+        "max-line-length": [
+            true,
+            160
+        ]
     },
     "rulesDirectory": []
 }
