@@ -14,6 +14,7 @@
         "array-type": false,
         "object-literal-sort-keys": false,
         "member-access": false,
+        "space-before-function-paren": false,
         "variable-name": [
             true,
             "check-format",

@@ -4,8 +4,6 @@ import { ReplaySubject } from 'rxjs/ReplaySubject';
 import { Dictionary } from './Types';
 
 /** @internal */
-import 'reflect-metadata';
-/** @internal */
 import 'rxjs/add/observable/empty';
 /** @internal */
 import 'rxjs/add/operator/switchMap';
@@ -14,21 +12,28 @@ const inputsKey = Symbol('inputs');
 const outputsKey = Symbol('outputs');
 
 export abstract class Node<TConfig = any> {
-    public static Input(name?: string) {
+    public static Input(name?: string): any {
         return (target, key: string) => {
             if (!name) { name = key; }
-            const inputsArray = Reflect.getMetadata(inputsKey, target) || [];
-            inputsArray.push({ name, key });
-            Reflect.defineMetadata(inputsKey, inputsArray, target);
+            return {
+                get(this: Node<any>) {
+                    return this.getInput(name);
+                },
+            };
         };
     }
 
-    public static Output(name?: string) {
+    public static Output(name?: string): any {
         return (target, key: string) => {
             if (!name) { name = key; }
-            const outputsArray = Reflect.getMetadata(outputsKey, target) || [];
-            outputsArray.push({ name, key });
-            Reflect.defineMetadata(outputsKey, outputsArray, target);
+            let value;
+            return {
+                get: () => value,
+                set(this: Node<any>, v: any) {
+                    this.setOutput(name, v);
+                    value = v;
+                },
+            };
         };
     }
 
@@ -48,25 +53,6 @@ export abstract class Node<TConfig = any> {
         public readonly id: string,
         public readonly config: TConfig,
     ) {
-        const attrInputs = Reflect.getMetadata(inputsKey, this) || [];
-        for (const attrInput of attrInputs) {
-            const input = this.getInput(attrInput.name);
-            Object.defineProperty(this, attrInput.key, {
-                get: () => input,
-            });
-        }
-
-        const attrOutputs = Reflect.getMetadata(outputsKey, this) || [];
-        for (const attrOutput of attrOutputs) {
-            let value;
-            Object.defineProperty(this, attrOutput.key, {
-                get: () => value,
-                set: (v) => {
-                    this.setOutput(attrOutput.name, v);
-                    value = v;
-                },
-            });
-        }
     }
 
     init(): void | Promise<void> {
