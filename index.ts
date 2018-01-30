@@ -4,20 +4,18 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { setTimeout } from 'timers';
-import { Input } from './Input';
-import { NodeBase } from './NodeBase';
+import { Node } from './NodeBase';
 import { NodeTest } from './NodeTest';
-import { Output } from './Output';
 import { Runtime } from './Runtime';
 
-class SingleValue extends NodeBase<{ value: number }> {
-    @Output()
+class SingleValue extends Node<{ value: number }> {
+    @Node.Output()
     value = new BehaviorSubject(this.config.value);
 }
 
 // tslint:disable-next-line:max-classes-per-file
-class ConsoleNode extends NodeBase {
-    @Input()
+class ConsoleNode extends Node {
+    @Node.Input()
     value: Observable<any>;
 
     private subscription: Subscription;
@@ -67,13 +65,14 @@ async function test() {
             { id: 'con3', fromNodeId: '1', fromOutput: 'sum', toNodeId: '4', toInput: 'value' },
         ],
     });
+
+    console.log('starting');
+    flow.start();
+    console.log('started');
+
     runtime.registerNode('console', ConsoleNode);
     runtime.registerNode('sum', NodeTest);
     runtime.registerNode('value', SingleValue);
-
-    console.log('starting');
-    await flow.start();
-    console.log('started');
 
     await delay(500);
 

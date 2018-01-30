@@ -1,4 +1,4 @@
-import { NodeBase } from './NodeBase';
+import { Node } from './NodeBase';
 
 export interface Dictionary<T> {
     [key: string]: T;
@@ -24,6 +24,6 @@ export interface NodeConfiguration {
     config?: any;
 }
 
-export interface NodeConstructor {
-    new(id: string, config: any): NodeBase;
+export interface NodeConstructor<TConfig = any> {
+    new(id: string, config: TConfig): Node<TConfig>;
 }

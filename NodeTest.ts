@@ -1,18 +1,16 @@
 import { Observable } from 'rxjs/Observable';
-import { Input } from './Input';
-import { NodeBase } from './NodeBase';
-import { Output } from './Output';
+import { Node } from './NodeBase';
 
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/map';
 
-export class NodeTest extends NodeBase {
-    @Input()
+export class NodeTest extends Node {
+    @Node.Input()
     a: Observable<number>;
 
-    @Input()
+    @Node.Input()
     b: Observable<number>;
 
-    @Output()
+    @Node.Output()
     sum = Observable.combineLatest(this.a, this.b).map(([a, b]) => a + b);
 }

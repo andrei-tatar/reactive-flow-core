@@ -1,17 +1,37 @@
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
-
-import { GetInputs } from './Input';
-import { GetOutputs } from './Output';
 import { Dictionary } from './Types';
 
+/** @internal */
+import 'reflect-metadata';
 /** @internal */
 import 'rxjs/add/observable/empty';
 /** @internal */
 import 'rxjs/add/operator/switchMap';
 
-export class NodeBase<TConfig = any> {
+const inputsKey = Symbol('inputs');
+const outputsKey = Symbol('outputs');
+
+export abstract class Node<TConfig = any> {
+    public static Input(name?: string) {
+        return (target, key: string) => {
+            if (!name) { name = key; }
+            const inputsArray = Reflect.getMetadata(inputsKey, target) || [];
+            inputsArray.push({ name, key });
+            Reflect.defineMetadata(inputsKey, inputsArray, target);
+        };
+    }
+
+    public static Output(name?: string) {
+        return (target, key: string) => {
+            if (!name) { name = key; }
+            const outputsArray = Reflect.getMetadata(outputsKey, target) || [];
+            outputsArray.push({ name, key });
+            Reflect.defineMetadata(outputsKey, outputsArray, target);
+        };
+    }
+
     private readonly _inputDict: Dictionary<ReplaySubject<any>> = {};
     private readonly _outputDict: Dictionary<ReplaySubject<any>> = {};
     private readonly _inputNames = new ReplaySubject<string>();
@@ -28,7 +48,7 @@ export class NodeBase<TConfig = any> {
         public readonly id: string,
         public readonly config: TConfig,
     ) {
-        const attrInputs = GetInputs(this);
+        const attrInputs = Reflect.getMetadata(inputsKey, this) || [];
         for (const attrInput of attrInputs) {
             const input = this.getInput(attrInput.name);
             Object.defineProperty(this, attrInput.key, {
@@ -36,7 +56,7 @@ export class NodeBase<TConfig = any> {
             });
         }
 
-        const attrOutputs = GetOutputs(this);
+        const attrOutputs = Reflect.getMetadata(outputsKey, this) || [];
         for (const attrOutput of attrOutputs) {
             let value;
             Object.defineProperty(this, attrOutput.key, {

@@ -8,14 +8,14 @@ import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/takeUntil';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { NodeBase } from './NodeBase';
+import { Node } from './NodeBase';
 import { Runtime } from './Runtime';
 import { ConnectionConfiguration, Dictionary, FlowConfiguration, NodeConfiguration } from './Types';
 
 export class Flow {
     private readonly _nodes = new Subject<NodeConfiguration>();
     private readonly _connections = new Subject<ConnectionConfiguration>();
-    private readonly _instances: Dictionary<{ instance: Promise<NodeBase>, stop: Subject<any> }> = {};
+    private readonly _instances: Dictionary<{ instance: Promise<Node>, stop: Subject<any> }> = {};
     private _stop: Subject<any>;
 
     constructor(
@@ -56,7 +56,7 @@ export class Flow {
         this._stop = null;
     }
 
-    async start() {
+    start() {
         if (this._stop) { throw new Error('Flow already running'); }
         this._stop = new Subject();
 

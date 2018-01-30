@@ -1,5 +1,5 @@
 import { Flow } from './Flow';
-import { NodeBase } from './NodeBase';
+import { Node } from './NodeBase';
 import { Dictionary, FlowConfiguration, NodeConstructor } from './Types';
 
 import { Observable } from 'rxjs/Observable';
@@ -18,7 +18,7 @@ export class Runtime {
         return new Flow(this, flow);
     }
 
-    getInstance(nodeType: string, id: string, config: any): Observable<NodeBase> {
+    getInstance(nodeType: string, id: string, config: any): Observable<Node> {
         return this._registeredNodes
             .first(r => r.type === nodeType)
             .map(r => new r.ctor(id, config));
